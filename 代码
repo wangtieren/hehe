@@ -1,0 +1,36 @@
+import tensorflow as tf    
+import numpy as np
+import random
+import matplotlib.pyplot as plt
+X=np.linspace(-4,4,200)[:,np.newaxis]#加维度
+noise=np.random.normal(0,1,X.shape)#加噪点，
+Y=np.square(X)-25+noise 
+X=np.reshape(X,(200,1))
+Y=np.reshape(Y,(200,1))
+#%% ANN
+with tf.name_scope('Input'):
+    X_in=tf.placeholder('float',shape=[None,1])
+    Y_in=tf.placeholder('float',shape=[None,1])
+with tf.name_scope('Layer'):
+    W1=tf.Variable(tf.random_normal([1,4],mean=1,stddev=0.2),name='w1')
+    b1=tf.Variable(tf.constant(0.1,shape=[4],dtype=tf.float32),name='b1')
+    out1=tf.nn.sigmoid(tf.add(tf.matmul(X_in,W1),b1))
+with tf.name_scope('Output'):
+    W2=tf.Variable(tf.random_normal([4,1],mean=1,stddev=0.2),name='w2')
+    b2=tf.Variable(tf.constant(0.1,shape=[1],dtype=tf.float32),name='b2')
+    out2=tf.add(tf.matmul(out1,W2),b2)
+with tf.name_scope('Evaluate'):
+    Loss=tf.reduce_mean(tf.square(out2-Y_in))
+    trainstep=tf.train.GradientDescentOptimizer(0.1).minimize(Loss)
+#%% Train
+with tf.Session() as sess:
+    step=0
+    sess.run(tf.global_variables_initializer())
+    while step<100:
+        Tstep=sess.run(trainstep,feed_dict={X_in:X, Y_in:Y})
+        if step%3==0:
+            loss=sess.run(Loss, feed_dict={X_in:X, Y_in:Y})
+        step+=1
+    Y_=sess.run(out2,feed_dict={X_in:X})
+plt.plot(X,Y,X,Y_)
+plt.show()
