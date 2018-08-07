@@ -26,7 +26,7 @@ with tf.name_scope('Evaluate'):
 with tf.Session() as sess:
     step=0
     sess.run(tf.global_variables_initializer())
-    while step<100:
+    while step<1000:
         Tstep=sess.run(trainstep,feed_dict={X_in:X, Y_in:Y})
         if step%3==0:
             loss=sess.run(Loss, feed_dict={X_in:X, Y_in:Y})
